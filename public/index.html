@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExpressJS Product REST API Dashboard</title>
+  <!-- Google Fonts - Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&amp;display=swap"
+    rel="stylesheet" />
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="glass-bg"></div>
+  <div class="glass-bg-2"></div>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fa-solid fa-fire-flame-curved"></i></div>
+        <div>
+          <h1>RESTApi</h1>
+          <p class="subtitle">ExpressJS Products API Dashboard</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="themeToggle" class="btn btn-secondary btn-icon-only" title="Ganti Tema">
+          <i class="fa-solid fa-moon" id="themeIcon"></i>
+        </button>
+        <div class="api-status">
+          <span class="status-indicator"></span>
+          <span class="status-text">Server Active</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-grid">
+      <section class="left-panel">
+
+        <!-- [POST] TAMBAH PRODUK BARU -->
+        <!-- Endpoint Target: POST /api/products -->
+        <div class="card glass-card">
+          <div class="card-header">
+            <div class="header-icon"><i class="fa-solid fa-plus"></i></div>
+            <h2>Tambah Produk Baru <span
+                style="font-size: 0.85rem; font-weight: normal; opacity: 0.6; margin-left: 0.5rem;">[POST]</span></h2>
+          </div>
+          <form id="productForm" class="product-form">
+            <div class="form-group">
+              <label for="pName"><i class="fa-solid fa-tag"></i> Nama Produk</label>
+              <input type="text" id="pName" placeholder="Contoh: Kopi Susu Aren" required="required" />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="pPrice"><i class="fa-solid fa-rupiah-sign"></i> Harga (Rp)</label>
+                <input type="number" id="pPrice" placeholder="18000" min="0" required="required" />
+              </div>
+              <div class="form-group">
+                <label for="pStock"><i class="fa-solid fa-boxes-stacked"></i> Stok</label>
+                <input type="number" id="pStock" placeholder="45" min="0" required="required" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="pCategory"><i class="fa-solid fa-layer-group"></i> Kategori</label>
+              <select id="pCategory" required="required">
+                <option value="" disabled="disabled" selected="selected">Pilih Kategori...</option>
+                <option value="Makanan">Makanan</option>
+                <option value="Minuman">Minuman</option>
+                <option value="Alat Tulis">Alat Tulis</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">
+              <span class="btn-text">Kirim Request (POST)</span>
+              <span class="btn-icon"><i class="fa-solid fa-paper-plane"></i></span>
+            </button>
+          </form>
+        </div>
+
+        <!-- [GET] DAFTAR PRODUK AKTIF -->
+        <!-- Endpoint Target: GET /api/products -->
+        <div class="card glass-card main-list-card">
+          <div class="card-header list-header-flex">
+            <div class="flex-title">
+              <div class="header-icon"><i class="fa-solid fa-box"></i></div>
+              <h2>Daftar Produk <span
+                  style="font-size: 0.85rem; font-weight: normal; opacity: 0.6; margin-left: 0.5rem;">[GET]</span></h2>
+            </div>
+            <button id="btnRefresh" class="btn btn-secondary btn-icon-only" title="Refresh Data (GET)">
+              <i class="fa-solid fa-arrows-rotate"></i>
+            </button>
+          </div>
+
+          <div class="filter-bar">
+            <div class="search-box">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="searchInput" placeholder="Cari nama produk..." />
+            </div>
+            <div class="category-filters">
+              <button class="filter-tab active" data-category="all">Semua</button>
+              <button class="filter-tab" data-category="Makanan">Makanan</button>
+              <button class="filter-tab" data-category="Minuman">Minuman</button>
+              <button class="filter-tab" data-category="Alat Tulis">Alat Tulis</button>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="product-table">
+              <thead>
+                <tr>
+                  <th class="col-id">ID</th>
+                  <th>Nama Produk</th>
+                  <th>Kategori</th>
+                  <th>Harga</th>
+                  <th>Stok</th>
+                  <!-- Aksi edit (PUT) dan hapus (DELETE) -->
+                  <th class="col-actions">Aksi <span
+                      style="font-size: 0.7rem; color: var(--text-muted); font-weight: normal;">[PUT/DELETE]</span></th>
+                </tr>
+              </thead>
+              <tbody id="productTableBody">
+                <!-- Data produk akan dirender secara dinamis di sini oleh app.js (GET) -->
+              </tbody>
+            </table>
+            <div class="empty-state" id="emptyState" style="display: none;">
+              <i class="fa-solid fa-box-open"></i>
+              <p>Tidak ada produk ditemukan</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- (LOGGER): API Request & Response Tracker -->
+      <section class="right-panel">
+        <!-- API Visualizer Logger -->
+        <div class="card glass-card api-logger-card">
+          <div class="card-header">
+            <div class="header-icon"><i class="fa-solid fa-terminal"></i></div>
+            <h2>API Request & Response Tracker</h2>
+          </div>
+          <div class="logger-content">
+            <div class="api-request-info">
+              <span class="method-badge" id="loggerMethod">GET</span>
+              <span class="url-path" id="loggerUrl">/api/products</span>
+            </div>
+            <div class="curl-visualizer">
+              <span class="label">cURL Command:</span>
+              <pre id="loggerCurl">curl -X GET http://localhost:3000/api/products</pre>
+            </div>
+            <div class="response-visualizer">
+              <span class="label">Response JSON:</span>
+              <pre id="loggerResponse">{ "status": "Waiting for requests..." }</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- [PUT] Edit Produk -->
+  <!-- Endpoint Target: PUT /api/products/:id -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-card glass-card">
+      <div class="modal-header">
+        <div class="header-icon"><i class="fa-solid fa-pen-to-square"></i></div>
+        <h2>Update Data Produk <span
+            style="font-size: 0.85rem; font-weight: normal; opacity: 0.6; margin-left: 0.5rem;">[PUT]</span></h2>
+        <button class="modal-close" id="btnCancelEdit" title="Tutup Modal"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <form id="editForm" class="product-form">
+        <input type="hidden" id="editId" />
+        <div class="form-group">
+          <label><i class="fa-solid fa-info-circle"></i> Nama Produk (Tidak Bisa Diubah)</label>
+          <input type="text" id="editName" disabled="disabled" class="input-disabled" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="editPrice"><i class="fa-solid fa-rupiah-sign"></i> Harga Baru (Rp)</label>
+            <input type="number" id="editPrice" min="0" required="required" />
+          </div>
+          <div class="form-group">
+            <label for="editStock"><i class="fa-solid fa-boxes-stacked"></i> Stok Baru</label>
+            <input type="number" id="editStock" min="0" required="required" />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="btnCancelEdit2">Batal</button>
+          <button type="submit" class="btn btn-primary">
+            <span class="btn-text">Update (PUT)</span>
+            <span class="btn-icon"><i class="fa-solid fa-check"></i></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>

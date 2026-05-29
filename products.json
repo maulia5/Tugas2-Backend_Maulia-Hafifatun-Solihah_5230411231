@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Kopi Susu Gula Aren",
+    "price": 18000,
+    "stock": 45,
+    "category": "Minuman"
+  },
+  {
+    "id": 2,
+    "name": "Keripik Singkong Balado",
+    "price": 12000,
+    "stock": 30,
+    "category": "Makanan"
+  },
+  {
+    "id": 3,
+    "name": "Buku Catatan Grid Estetik",
+    "price": 25000,
+    "stock": 20,
+    "category": "Alat Tulis"
+  },
+  {
+    "id": 4,
+    "name": "Kopi kapal api",
+    "price": 16000,
+    "stock": 15,
+    "category": "Minuman"
+  }
+]
